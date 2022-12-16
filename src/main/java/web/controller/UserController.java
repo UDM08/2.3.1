@@ -1,0 +1,63 @@
+package web.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import web.model.User;
+import web.service.UserService;
+
+@Controller
+@RequestMapping("/users")
+
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+
+    @GetMapping
+    public String AllUsers(Model model) {
+        model.addAttribute("user", userService.getAllUsers());
+        return "user_list";
+    }
+
+    @GetMapping("/new")
+    public String newUser(Model model) {
+        model.addAttribute("user", new User());
+        return "new_user";
+    }
+
+    @PostMapping
+    public String addUser(@ModelAttribute("user") User user) {
+        userService.saveUser(user);
+        return "redirect:/users";
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public String removeById(@PathVariable("id") long id) {
+        userService.removeUserById(id);
+        return "redirect:/users";
+
+    }
+
+    @PatchMapping("edit/update/{id}")
+    public String update(@ModelAttribute("user") User user, @PathVariable("id") long id) {
+        userService.updateUser(id, user);
+        return "redirect:/users";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable("id") long id, Model model) {
+        model.addAttribute("user", userService.getUserById(id));
+        return "user_edit";
+    }
+
+    @GetMapping("/{id}")
+    public String getById(@PathVariable("id") long id, Model model) {
+        model.addAttribute("user", userService.getUserById(id));
+        return "user_id";
+    }
+}
